@@ -28,13 +28,15 @@ function getHTML(res){
         if(err) return console.log(err);
         fs.readFile('cdp.html', (err, htmldata) => {
 			if(err) return console.log(err);
-			let html = htmldata.toString().replace("%script%", jsdata.toString());
+			let script = "<script>\n" + jsdata.toString() + "\n</script>";
+			let html = htmldata.toString().replace("<script src=\"cdp.js\"></script>", script);
 			res.end(html);
+			return html;
 		});
     });
 }
 
 http.createServer( (request, response) => {
 	response.writeHead(200, {"Content-Type": "text/html"});
-    getHTML(response);
+    let h = getHTML(response);
 }).listen(8888);
