@@ -1,35 +1,55 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="height=device-height width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<link rel="shortcut icon" href="#" />
     <title>CDP</title>
 </head>
 
 <body>
-	<textarea name="textfield" cols="41" rows="25"></textarea>
-	<div class="container">
+	<div class="namebox">
+		<p>用户名：</p>
+		<input type="text">
+	</div>
+	<textarea class="textarea"></textarea>
+	<div class="sendbox">
 		<input type="text" placeholder="输入">
 		<button>发送</button>
 	</div>
 	<style>
-		.container{
+		.namebox{
 			position: relative;
-			width: 300px;
-			background-color: #f1f1f1;
+			width: 500px;
 		}
-		.container input{
+		.namebox input{
+			position: absolute;
+			top: 0px;
+			left: 70px;
+			width: 430px;
+			height: 30px;
+		}
+		.textarea{
+			position: relative;
+			top: -7px;
+			width: 500px;
+			height: 500px;
+		}
+		.sendbox{
+			position: relative;
+			top: -7px;
+			width: 500px;
+		}
+		.sendbox input{
 			width: 100%;
 			height: 30px;
 		}
-		.container button{
+		.sendbox button{
 			position: absolute;
 			top: 5px;
 			right: 2;
 			background-color: #fff;
 			border: none;
 			outline: none;
-		 }
+		}
 	</style>
 	<script src="cdp.js"></script>
 </body>

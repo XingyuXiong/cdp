@@ -1,27 +1,9 @@
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
-const ws = require('nodejs-websocket')
+const WebSocket = require('ws');
 
 record = "";
-
-var wss = ws.createServer( (connection) => {
-	connection.on('connect', (msg) => {
-		console.log(msg.toString());
-	});
-	connection.on('text', (msg) => {
-		console.log('Received text: ' + msg);
-		record += (msg + "\n");
-		wss.connections.forEach( (conn) => {
-			conn.sendText(record);
-		});
-	})
-	connection.on('error', (msg) => {
-		console.log('error' + msg);
-    });
-});
-
-wss.listen(888);
 
 function getHTML(res){
     fs.readFile('cdp.js', (err, jsdata) => {
@@ -31,12 +13,31 @@ function getHTML(res){
 			let script = "<script>\n" + jsdata.toString() + "\n</script>";
 			let html = htmldata.toString().replace("<script src=\"cdp.js\"></script>", script);
 			res.end(html);
-			return html;
 		});
     });
 }
 
-http.createServer( (request, response) => {
+const hserver = http.createServer( (request, response) => {
 	response.writeHead(200, {"Content-Type": "text/html"});
-    let h = getHTML(response);
-}).listen(8888);
+    getHTML(response);
+}).listen(8080);
+const wsserver = new WebSocket.Server({ server: hserver });
+
+wsserver.on('connection', (conn) => {
+	console.log("new connection");
+	conn.on('message', (msg) => {
+		console.log('Received text: \"' + msg + "\"");
+		let txt = msg.toString() + "\n";
+		record += txt;
+		wsserver.clients.forEach( (cli) => {
+			cli.send(txt);
+		});
+	})
+	conn.on('close', () => {
+		console.log("connection lost");
+    });
+	conn.on('error', (ev) => {
+		console.log('error' + ev);
+    });
+	conn.send(record);
+});
