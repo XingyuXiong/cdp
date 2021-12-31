@@ -1,11 +1,13 @@
-# cdp
-cdp development
-# to do list
-server-client
-game start, login(only username), credential:cookie, avatar
-optional:upload rule document(players, game rules, cards)
-play cards, card status define(up and down), card owned by someone, status transfer
-json data:{card id, card type, data:{}}
+npm install ws
 
-status:{}
-card:
+node server.js
+
+http://localhost:8080
+
+
+
+fly.io official websocket tutorial
+https://fly.io/blog/websockets-and-fly/
+
+ws: a Node.js WebSocket library
+https://github.com/websockets/ws/blob/HEAD/doc/ws.md
