@@ -33,17 +33,20 @@ const wsserver = new WebSocket.Server({ server: hserver });
 
 wsserver.on('connection', (conn) => {
 	console.log("new connection");
-	conn.on('message', onreceive);
+	conn.on('message', ((theconn) => {
+		// use closure to reply more easily
+		return (msg) => { onreceive(theconn, msg); }; 
+	})(conn));
 	conn.on('close', () => { console.log("connection lost"); });
 	conn.on('error', (ev) => { console.log('error' + ev); });
-	sendScript(conn, "frame\\default.js");
-	sendScript(conn, "cards\\default.js");
 });
 
-function onreceive(msg){
+function onreceive(conn, msg){
 	let m = JSON.parse(msg.toString());
 	if(m['type'] == 'login'){
 		console.log(m['content'] + " has just logged in!");
+		sendScript(conn, "frame\\default.js");
+		sendScript(conn, "cards\\default.js");
 	} else if(m['type'] == 'data'){
 		
 		// to be continued...
