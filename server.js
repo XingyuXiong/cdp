@@ -6,14 +6,22 @@ const WebSocket = require('ws');
 record = "";
 
 function getHTML(res){
-    fs.readFile('cdp.js', (err, jsdata) => {
+    fs.readFile('script.js', (err, jsdata) => {
         if(err) return console.log(err);
         fs.readFile('cdp.html', (err, htmldata) => {
 			if(err) return console.log(err);
 			let script = "<script>\n" + jsdata.toString() + "\n</script>";
-			let html = htmldata.toString().replace("<script src=\"cdp.js\"></script>", script);
+			let html = htmldata.toString().replace("<script src=\"script.js\"></script>", script);
 			res.end(html);
 		});
+    });
+}
+
+function sendScript(conn, path){
+    fs.readFile(path, (err, text) => {
+        if(err) return console.log(err);
+		let t = { type:'script', content:text.toString()};
+        conn.send(JSON.stringify(t));
     });
 }
 
@@ -25,19 +33,20 @@ const wsserver = new WebSocket.Server({ server: hserver });
 
 wsserver.on('connection', (conn) => {
 	console.log("new connection");
-	conn.on('message', (msg) => {
-		console.log('Received text: \"' + msg + "\"");
-		let txt = msg.toString() + "\n";
-		record += txt;
-		wsserver.clients.forEach( (cli) => {
-			cli.send(txt);
-		});
-	})
-	conn.on('close', () => {
-		console.log("connection lost");
-    });
-	conn.on('error', (ev) => {
-		console.log('error' + ev);
-    });
-	conn.send(record);
+	conn.on('message', onreceive);
+	conn.on('close', () => { console.log("connection lost"); });
+	conn.on('error', (ev) => { console.log('error' + ev); });
+	sendScript(conn, "frame\\default.js");
+	sendScript(conn, "cards\\default.js");
 });
+
+function onreceive(msg){
+	let m = JSON.parse(msg.toString());
+	if(m['type'] == 'login'){
+		console.log(m['content'] + " has just logged in!");
+	} else if(m['type'] == 'data'){
+		
+		// to be continued...
+		
+	}
+}
