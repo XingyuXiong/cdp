@@ -70,9 +70,6 @@ eventEmitter.on('ready', (conn, _) => {
 	var t = { type:'sync', content:card_list };
 	conn.send(JSON.stringify(t));
 });
-//                                                                     //
-/////////////////////////////////////////////////////////////////////////
-
 
 eventEmitter.on('chat', (conn, text) => {
 	var username = "xjp";
@@ -81,10 +78,10 @@ eventEmitter.on('chat', (conn, text) => {
 	wsserver.clients.forEach( (cli) => { cli.send(JSON.stringify(t)); });
 });
 
-////////////////////////////// test /////////////////////////////////////
-//                                                                     //
 eventEmitter.on('move', (conn, data) => {
+	var username = "xjp";
 	data.cards.forEach( (id, _) => { card_list[id].loc = data.toloc; });
+	data['username'] = username;
 	var t = { type:'move', content:data };
 	wsserver.clients.forEach( (cli) => { cli.send(JSON.stringify(t)); });
 });
