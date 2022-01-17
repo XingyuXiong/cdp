@@ -44,9 +44,9 @@ function init_frame(){
 	var CHATBOX_WIDTH = Math.max(WINDOW_WIDTH*0.34, WINDOW_HEIGHT*0.21), CHATBOX_HEIGHT = Math.max(WINDOW_WIDTH*0.32, WINDOW_HEIGHT*0.6);
 	
 	var css = "body{overflow:hidden;}"
-			+ ".Card{position:absolute;width:" + CARD_WIDTH + "px;height:" + CARD_HEIGHT + "px;border:" + CARD_BORDER + "px;border-radius:" + CARD_RADIUS + "px;background-color:lightblue;}"
-			+ ".Playerbox{position:absolute;width:" + PLAYERBOX_WIDTH + "px;height:" + PLAYERBOX_HEIGHT + "px;border:5px;border-radius:5px;background-color:lightblue;}"
-			+ ".Pile{position:absolute;width:" + PILE_WIDTH + "px;height:" + PILE_HEIGHT + "px;border:4px;border-radius:2px;background-color:lightblue;}"
+			+ ".Card{position:absolute;width:" + CARD_WIDTH + "px;height:" + CARD_HEIGHT + "px;border:" + CARD_BORDER + "px;border-radius:" + CARD_RADIUS + "px;}"
+			+ ".Playerbox{position:absolute;width:" + PLAYERBOX_WIDTH + "px;height:" + PLAYERBOX_HEIGHT + "px;border:5px;border-radius:5px;}"
+			+ ".Pile{position:absolute;width:" + PILE_WIDTH + "px;height:" + PILE_HEIGHT + "px;border:4px;border-radius:2px;}"
 			+ "#chatbox{position:absolute;width:" + CHATBOX_WIDTH + "px;height:" + CHATBOX_HEIGHT + "px;left:0px;top:0px;}"
 			+ "#cb_txa{position:absolute;width:" + (CHATBOX_WIDTH-6) + "px;height:" + (CHATBOX_HEIGHT-0.15*CARD_HEIGHT) + "px;left:0px;top:0px;}"
 			+ "#cb_inp{position:absolute;width:" + (CHATBOX_WIDTH-6) + "px;height:" + (0.15*CARD_HEIGHT) +"px;left:-2px;bottom:0px;}"
@@ -83,13 +83,30 @@ function received_situation(ce){
 document.addEventListener("_sync", received_situation);
 
 
+function automoveto(elem, pos, op, dt=0.5){
+	var dx = (pos.x - parseFloat(elem.style['left'])) * WINDOW_WIDTH / 100,
+		dy = (pos.y - parseFloat(elem.style['top'])) * WINDOW_HEIGHT / 100,
+		tx = document.createElement('p');
+	tx.innerText = op.toString();
+	elem.appendChild(tx);
+	elem.ontransitionend = ((ev) => {
+		elem.ontransitionend = null;
+		elem.style['transition-duration'] = "";
+		elem.style['transform'] = "";
+		elem.style.left = pos.x + "%";
+		elem.style.top = pos.y + "%";
+		elem.removeChild(tx);
+	});
+	elem.style['transition-duration'] = dt + "s";
+	elem.style['transform'] = "translate(" + dx + "px," + dy + "px)";
+}
 function received_movement(ce){
-	var newloc = ce.detail.toloc;
+	var newloc = ce.detail.toloc, 
+		operator = ce.detail.username;
 	ce.detail.cards.forEach( (id, _) => { 
 		CARDS[id].loc = newloc;
 		if(newloc.pile == 'desk'){
-			document.getElementById(id).style.left = newloc.pos.x + "%";
-			document.getElementById(id).style.top = newloc.pos.y + "%";
+			automoveto(document.getElementById(id), newloc.pos, operator);
 		}
 	});
 }
